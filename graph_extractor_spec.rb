@@ -33,6 +33,8 @@ describe ClassCodeExtractor do
   context "#sole_class_in_file" do
     it "sets the whole content as single class code" do
       code = %Q{
+        require "something"
+
         class Foo
         end
       }

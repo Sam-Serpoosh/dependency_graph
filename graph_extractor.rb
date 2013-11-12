@@ -14,14 +14,19 @@ class ClassCodeExtractor
 
   def non_empty_lines(code)
     lines = code.split(/\n/)
-    lines.select do |line|
-      line.strip != ""
-    end
+    lines.select { |line| line.strip != "" }
   end
 
   def grab_class_names
-    words = @code_lines[0].split(/\W+/)
+    line = class_definition_line
+    words = line.split(/\W+/)
     words = words.select { |word| word.strip != "" }
     words[1].to_sym
+  end
+
+  def class_definition_line
+    @code_lines.find do |line|
+      line.strip.start_with?("class")
+    end
   end
 end

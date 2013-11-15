@@ -1,32 +1,6 @@
 require_relative "./graph_extractor"
 
 describe "Dependenchy Graph Extraction" do
-  it "extracts lines of code in a class scope" do
-    file_content = %Q{
-      class Foo
-        def hello
-          puts "HELLO"
-        end
-      end
-
-      class Bar
-        def hi
-          puts "Hi"
-        end
-
-        def baz
-          num = 10
-          puts "baz"
-        end
-      end
-    }
-    code_extractor = ClassCodeExtractor.new(file_content)
-    classes_codes = code_extractor.extract
-    classes_codes.should have_key(:Foo)
-    classes_codes[:Foo].should include("def hello")
-    classes_codes.should have_key(:Bar)
-    classes_codes[:Bar].should include("num = 10")
-  end
 end
 
 describe ClassCodeExtractor do
@@ -63,24 +37,30 @@ describe ClassCodeExtractor do
     end
 
     it "sets code for all classes accurately - no code btwn class defs" do
-      code = %Q{
-        class Foo
-          def foo
-          end
+      file_content = %Q{
+      class Foo
+        def hello
+          puts "HELLO"
+        end
+      end
+
+      class Bar
+        def hi
+          puts "Hi"
         end
 
-        class Bar
-          def bar
-          end
+        def baz
+          num = 10
+          puts "baz"
         end
+      end
       }
-      code_extractor = ClassCodeExtractor.new(code)
+      code_extractor = ClassCodeExtractor.new(file_content)
       classes_codes = code_extractor.extract
-
-      classes_codes[:Foo].should include("def foo")
-      classes_codes[:Foo].should_not include("def bar")
-      classes_codes[:Bar].should include("def bar")
-      classes_codes[:Bar].should_not include("def foo")
+      classes_codes.should have_key(:Foo)
+      classes_codes[:Foo].should include("def hello")
+      classes_codes.should have_key(:Bar)
+      classes_codes[:Bar].should include("num = 10")
     end
 
     it "sets code for all classes - code between their definitions"

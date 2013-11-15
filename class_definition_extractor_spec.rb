@@ -21,5 +21,26 @@ describe ClassDefinitionExtractor do
       extractor.extract
       extractor.scopes.count.should == 0
     end 
+
+    it "enters a new scope when encounter method definition" do
+      code = %Q{
+        class Foo
+          def foo
+      }
+      extractor = ClassDefinitionExtractor.new(code)
+      extractor.extract
+      extractor.scopes.count.should == 2
+    end
+
+    it "exits from current scope when enter an 'end' keyword" do
+      code = %Q{
+        class Foo
+          def foo
+          end
+      }
+      extractor = ClassDefinitionExtractor.new(code) 
+      extractor.extract
+      extractor.scopes.count.should == 1
+    end
   end
 end

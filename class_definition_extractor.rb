@@ -9,21 +9,27 @@ class ClassDefinitionExtractor
   MODULE = "module"
   IF = "if"
 
-  attr_reader :scopes
+  attr_reader :scopes, :class_defs
 
   def initialize(code)
     @scopes = []
+    @class_defs = {}
     @code_lines = non_empty_lines(code)
   end
 
   def extract
     @code_lines.each do |line|
-      if enter_scope(line)
-        @scopes.push(NEW_SCOPE)
-      elsif exit_scope(line)
-        @scopes.pop
-      end
+      manage_scopes_and_class_defs(line)
     end
+  end
+
+  def class_def?(line)
+    line.start_with?(CLASS) 
+  end
+
+  def grab_class_name(line)
+    tokens = line.split(/ /).select { |str| str != "" }
+    tokens[1].to_sym
   end
 
   private
@@ -33,7 +39,18 @@ class ClassDefinitionExtractor
     lines.select { |line| line.strip != EMPTY_STR }.map(&:strip)
   end
 
-  def enter_scope(line)
+  def manage_scopes_and_class_defs(line)
+    if entered_scope?(line)
+      if class_def?(line)
+        class_defs[grab_class_name(line)] = ""
+      end
+      scopes.push(NEW_SCOPE)
+    elsif left_scope?(line)
+      scopes.pop
+    end
+  end
+
+  def entered_scope?(line)
     line.start_with?(CLASS)     || 
       line.start_with?(DEF)     ||
       line.start_with?(UNLESS)  ||
@@ -42,7 +59,7 @@ class ClassDefinitionExtractor
       line.start_with?(CASE)
   end
 
-  def exit_scope(line)
+  def left_scope?(line)
     line.start_with?(END_WORD)
   end
 end

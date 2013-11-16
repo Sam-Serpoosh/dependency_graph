@@ -42,12 +42,19 @@ class ClassDefinitionExtractor
   def manage_scopes_and_class_defs(line)
     if entered_scope?(line)
       if class_def?(line)
-        class_defs[grab_class_name(line)] = ""
+        @current_class = grab_class_name(line)
+        class_defs[@current_class] = []
       end
       scopes.push(NEW_SCOPE)
     elsif left_scope?(line)
       scopes.pop
     end
+    add_line_to_class_def(line)
+  end
+
+  def add_line_to_class_def(line)
+    return if @current_class.nil? || scopes.empty?
+    class_defs[@current_class] << line
   end
 
   def entered_scope?(line)

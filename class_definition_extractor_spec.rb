@@ -52,6 +52,31 @@ describe ClassDefinitionExtractor do
       extractor.extract
       extractor.class_defs.should have_key(:Foo)
     end
+
+    it "stores class definition code lines for a class" do
+      code = %Q{
+        class Foo
+          def foo
+            puts "Hello World!"
+          end
+        end
+      }
+      extractor = ClassDefinitionExtractor.new(code)
+      extractor.extract
+      class_def = extractor.class_defs[:Foo]
+      contains_all?(class_def, "class Foo", "def foo", 
+                    %Q[puts "Hello World!"], "end").should be_true
+    end
+
+    def contains_all?(ary, *elements)
+      elements.each do |element|
+        if !ary.include?(element)
+          puts "Missing value '#{element}'"
+          return false
+        end
+      end
+      true
+    end
   end
 
   context ".class_def?" do

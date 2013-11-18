@@ -32,7 +32,7 @@ describe ClassDefinitionExtractor do
       extractor.scopes.count.should == 2
     end
 
-    it "exits from current scope when enter an 'end' keyword" do
+    it "exits from current scope when encounter 'end' keyword" do
       code = %Q{
         class Foo
           def foo
@@ -76,6 +76,58 @@ describe ClassDefinitionExtractor do
         end
       end
       true
+    end
+  end
+
+  context "#not_nested_class_definition_and_multiple_classes_in_file" do
+    it "stores all defined class names in the code" do
+      code = %Q{
+        class Foo
+        end
+
+        class Bar
+        end
+      }
+      extractor = ClassDefinitionExtractor.new(code)
+      extractor.extract
+      extractor.class_defs.should have_key(:Foo)
+      extractor.class_defs.should have_key(:Bar)
+    end 
+
+    it "stores class definition code lines for all defined classes" do
+      code = %Q{
+        class Foo
+          def foo
+          end
+        end
+
+        class Bar
+          def bar
+          end
+        end
+      }
+      extractor = ClassDefinitionExtractor.new(code)
+      extractor.extract
+      extractor.class_defs[:Foo].should include("def foo")
+      extractor.class_defs[:Foo].should_not include("def bar")
+      extractor.class_defs[:Bar].should include("def bar")
+      extractor.class_defs[:Bar].should_not include("def foo")
+    end
+
+    it "does NOT store lines between class definitions - if exists" do
+      code = %Q{
+        class Foo
+        end
+
+        puts
+
+        class Bar
+        end
+      }
+      extractor = ClassDefinitionExtractor.new(code)
+      extractor.extract
+      extractor.class_defs[:Foo].should_not include("puts")
+      extractor.class_defs[:Bar].should_not include("puts")
     end
   end
 

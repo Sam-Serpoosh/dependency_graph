@@ -53,8 +53,7 @@ class ClassDefinitionExtractor
   end
 
   def add_line_to_class_def(line)
-    return if @current_class.nil? || scopes.empty?
-    class_defs[@current_class] << line
+    class_defs[@current_class] << line unless scopes.empty?
   end
 
   def entered_scope?(line)

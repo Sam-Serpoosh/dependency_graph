@@ -6,6 +6,7 @@ describe DependencyExtractor do
                   "bar.some_method", "end"]
     dep_extractor = DependencyExtractor.new(:Foo, code_lines)
     dep_extractor.extract
+    dep_extractor.dependencies.count.should == 1
     dep_extractor.dependencies.should include(:Bar)
   end
 
@@ -14,6 +15,7 @@ describe DependencyExtractor do
                   "Baz.new", "baz.func", "end"]
     dep_extractor = DependencyExtractor.new(:Foo, code_lines)
     dep_extractor.extract
+    dep_extractor.dependencies.count.should == 2
     dep_extractor.dependencies.should == [:Bar, :Baz]
   end
 end

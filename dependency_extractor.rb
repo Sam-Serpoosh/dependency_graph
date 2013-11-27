@@ -25,9 +25,7 @@ class DependencyExtractor
   end
 
   def tokenize_line(line)
-    tokens = line.split(" ").select do |token|
-      token.strip != ""
-    end.map(&:strip)
+    tokens = line.split(/\s+/).map(&:strip)
     tokens.map do |token|
       token.split(/\./)
     end.flatten

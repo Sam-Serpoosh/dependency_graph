@@ -43,6 +43,29 @@ describe ClassDefinitionExtractor do
       extractor.scopes.count.should == 1
     end
 
+    it "enters a new scope when enter a block" do
+      code = %Q{
+        class Foo
+          define_method(:hello) do |name|
+            puts "Hello -name-"
+            # incomplete for scope test purposes
+      }
+      extractor = ClassDefinitionExtractor.new(code)
+      extractor.extract
+      extractor.scopes.count.should == 2
+    end
+
+    it "checks the actual token for scope detection NOT starting chars" do
+      code = %Q{
+        class Foo
+          classification something 
+          # this line starts with 'class' as well but not a scope entrance
+      }
+      extractor = ClassDefinitionExtractor.new(code)
+      extractor.extract
+      extractor.scopes.count.should == 1
+    end
+
     it "stores the name of the class when enter its definition" do
       code = %Q{
         class Foo
@@ -119,7 +142,7 @@ describe ClassDefinitionExtractor do
         class Foo
         end
 
-        puts
+        puts "hello world!"
 
         class Bar
         end

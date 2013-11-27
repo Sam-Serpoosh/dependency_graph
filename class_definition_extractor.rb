@@ -8,6 +8,7 @@ class ClassDefinitionExtractor
   CASE = "case"
   MODULE = "module"
   IF = "if"
+  DO = "do"
 
   attr_reader :scopes, :class_defs
 
@@ -28,7 +29,7 @@ class ClassDefinitionExtractor
   end
 
   def grab_class_name(line)
-    tokens = line.split(/ /).select { |str| str != "" }
+    tokens = line.split(/\s+/)
     tokens[1].to_sym
   end
 
@@ -57,12 +58,15 @@ class ClassDefinitionExtractor
   end
 
   def entered_scope?(line)
-    line.start_with?(CLASS)     || 
-      line.start_with?(DEF)     ||
-      line.start_with?(UNLESS)  ||
-      line.start_with?(MODULE)  || 
-      line.start_with?(IF)      ||
-      line.start_with?(CASE)
+    tokens = line.split(/\s+/)
+    return false if tokens.empty?
+    tokens.first == CLASS   ||
+    tokens.first == DEF     ||
+    tokens.first == UNLESS  ||
+    tokens.first == MODULE  ||
+    tokens.first == IF      ||
+    tokens.first == CASE    ||
+    tokens.include?(DO)
   end
 
   def left_scope?(line)

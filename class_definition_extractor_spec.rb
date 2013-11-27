@@ -166,6 +166,12 @@ describe ClassDefinitionExtractor do
       extractor = ClassDefinitionExtractor.new("")
       extractor.class_def?(line).should be_false
     end
+
+    it "knows when the code line is NOT a class definition - checks by 'class' token" do
+      line = "class_def = 'something'"
+      extractor = ClassDefinitionExtractor.new("")
+      extractor.class_def?(line).should be_false
+    end
   end
 
   context ".grab_class_name" do

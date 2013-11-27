@@ -25,7 +25,9 @@ class ClassDefinitionExtractor
   end
 
   def class_def?(line)
-    line.start_with?(CLASS) 
+    tokens = line.split(/\s+/)
+    return false if tokens.empty?
+    tokens[0] == CLASS
   end
 
   def grab_class_name(line)
@@ -54,7 +56,7 @@ class ClassDefinitionExtractor
   end
 
   def add_line_to_class_def(line)
-    class_defs[@current_class] << line unless scopes.empty?
+    class_defs[@current_class] << line unless scopes.empty? || @current_class.nil?
   end
 
   def entered_scope?(line)

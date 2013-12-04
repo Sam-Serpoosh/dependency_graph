@@ -1,3 +1,5 @@
+require_relative "./class_name_and_scopes_register"
+
 class ClassDefinitionExtractor
   EMPTY_STR = ""
   NEW_SCOPE = "new scope"
@@ -16,6 +18,7 @@ class ClassDefinitionExtractor
     @scopes = []
     @class_defs = {}
     @code_lines = non_empty_lines(code)
+    @classes_and_scopes = []
   end
 
   def extract
@@ -27,12 +30,12 @@ class ClassDefinitionExtractor
   def class_def?(line)
     tokens = line.split(/\s+/)
     return false if tokens.empty?
-    tokens[0] == CLASS
+    tokens.first == CLASS || tokens.first == MODULE
   end
 
   def grab_class_name(line)
     tokens = line.split(/\s+/)
-    tokens[1].to_sym
+    tokens[1]
   end
 
   private
@@ -45,18 +48,42 @@ class ClassDefinitionExtractor
   def manage_scopes_and_class_defs(line)
     if entered_scope?(line)
       if class_def?(line)
-        @current_class = grab_class_name(line)
-        class_defs[@current_class] = []
+        store_existing_current_class_scope
+        update_current_class_scope(line)
       end
       scopes.push(NEW_SCOPE)
     elsif left_scope?(line)
       scopes.pop
+      @current_class = nil if scopes.empty?
     end
     add_line_to_class_def(line)
   end
 
+  def store_existing_current_class_scope
+    if !@current_class.nil?
+      @classes_and_scopes << ClassNameAndScopesRegister.
+        new(@current_class, scopes.count)
+    end
+  end
+
+  def update_current_class_scope(line)
+    @current_class = current_class_name(line)
+    class_defs[@current_class] = []
+  end
+
+  def current_class_name(line)
+    current_class_name =  grab_class_name(line)
+    if @classes_and_scopes.empty?
+      return current_class_name
+    else
+      class_names_so_far = @classes_and_scopes.map(&:class_name)
+      return "#{class_names_so_far.join("::")}::#{current_class_name}"
+    end
+  end
+
   def add_line_to_class_def(line)
-    class_defs[@current_class] << line unless scopes.empty? || @current_class.nil?
+    class_defs[@current_class] << line unless scopes.empty? || 
+      @current_class.nil?
   end
 
   def entered_scope?(line)
@@ -72,6 +99,7 @@ class ClassDefinitionExtractor
   end
 
   def left_scope?(line)
-    line.start_with?(END_WORD)
+    tokens = line.split(/\s+/)
+    tokens.first == END_WORD
   end
 end

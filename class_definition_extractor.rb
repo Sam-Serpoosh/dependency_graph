@@ -49,7 +49,7 @@ class ClassDefinitionExtractor
     if entered_scope?(line)
       if class_def?(line)
         store_existing_current_class_scope
-        update_current_class_scope(line)
+        update_current_class_and_scopes(line)
       end
       scopes.push(NEW_SCOPE)
     elsif left_scope?(line)
@@ -62,13 +62,14 @@ class ClassDefinitionExtractor
   def store_existing_current_class_scope
     if !@current_class.nil?
       @classes_and_scopes << ClassNameAndScopesRegister.
-        new(@current_class, scopes.count)
+        new(@current_class.clone, scopes.count)
     end
   end
 
-  def update_current_class_scope(line)
+  def update_current_class_and_scopes(line)
     @current_class = current_class_name(line)
     class_defs[@current_class] = []
+    scopes.clear
   end
 
   def current_class_name(line)
@@ -82,8 +83,15 @@ class ClassDefinitionExtractor
   end
 
   def add_line_to_class_def(line)
-    class_defs[@current_class] << line unless scopes.empty? || 
-      @current_class.nil?
+    if scopes.empty? || @current_class.nil?
+      return if @classes_and_scopes.empty?
+      previous_class = @classes_and_scopes.pop
+      @current_class = previous_class.class_name
+      previous_class.scopes_count.times { scopes.push(NEW_SCOPE) }
+    else
+      class_defs[@current_class] << line unless scopes.empty? || 
+        @current_class.nil?
+    end
   end
 
   def entered_scope?(line)

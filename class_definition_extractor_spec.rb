@@ -196,5 +196,24 @@ describe ClassDefinitionExtractor do
       extractor.extract
       extractor.class_defs.keys.should include("M::C")
     end
+
+    it "restores to previous class with its code lines when exits from current nested class" do
+      code = %Q{
+        module A
+          puts "Hello from A"
+          class B
+            puts "Hello from B"
+          end
+
+          puts "Bye from A"
+      }
+      extractor = ClassDefinitionExtractor.new(code)
+      extractor.extract
+      extractor.class_defs["A"].should include(%Q[puts "Bye from A"])
+      extractor.class_defs["A"].should_not include("class B")
+      extractor.class_defs["A::B"].should include(%[puts "Hello from B"])
+      extractor.class_defs["A::B"].
+        should_not include(%Q[puts "Bye from A"])
+    end
   end
 end

@@ -4,7 +4,7 @@ class DependencyExtractor
   def initialize(klass, code_lines)
     @dependencies = []
     @code_lines = code_lines
-    @klass = klass
+    @klass = klass.to_sym
   end
 
   def extract
@@ -33,7 +33,20 @@ class DependencyExtractor
 
   def camel_case_tokens(tokens)
     tokens.select do |token|
-      ("A".."Z").include?(token[0])
+      start_with_capital(token) && not_constant?(token)
     end
+  end
+
+  def start_with_capital(token) 
+    ("A".."Z").include?(token[0])
+  end
+
+  def not_constant?(token)
+    token.each_char do |ch|
+      return true if !("A".."Z").include?(ch) && 
+                     ch != "_" && 
+                     !("0".."9").include?(ch)
+    end
+    false
   end
 end

@@ -25,4 +25,12 @@ describe DependencyExtractor do
     dep_extractor.extract
     dep_extractor.dependencies.should == [:Baz]
   end
+
+  it "does not contain a dependency twice" do
+    code_lines = ["class Bar", "def initialize", "Foo.new", "end", 
+                  "def some_method", "Foo.some_method", "end", "end"]
+    dep_extractor = DependencyExtractor.new(:Bar, code_lines) 
+    dep_extractor.extract
+    dep_extractor.dependencies.should == [:Foo]
+  end
 end

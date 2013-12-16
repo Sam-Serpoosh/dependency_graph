@@ -20,7 +20,9 @@ class DependencyExtractor
     possible_class_names = camel_case_tokens(tokens)
     possible_class_names.each do |name|
       name_sym = name.to_sym
-      @dependencies << name_sym if name_sym != @klass
+      if name_sym != @klass && !@dependencies.include?(name_sym)
+        @dependencies << name_sym 
+      end
     end
   end
 

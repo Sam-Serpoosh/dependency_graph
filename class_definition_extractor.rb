@@ -10,6 +10,7 @@ class ClassDefinitionExtractor
   CASE = "case"
   MODULE = "module"
   IF = "if"
+  WHILE = "while"
   DO = "do"
 
   attr_reader :scopes, :class_defs
@@ -100,6 +101,7 @@ class ClassDefinitionExtractor
     tokens.first == MODULE  ||
     tokens.first == IF      ||
     tokens.first == CASE    ||
+    tokens.first == WHILE   ||
     tokens.include?(DO)
   end
 

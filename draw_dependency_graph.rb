@@ -1,8 +1,10 @@
 require_relative "./class_definition_extractor"
 require_relative "./dependency_extractor"
+require 'graphviz'
 
 class DrawDependencyGraph
   def initialize(code_file)
+    @file_without_extension = File.basename(code_file, ".*")
     content = File.read(code_file)
     @class_definition_extractor = ClassDefinitionExtractor.new(content)
     @classes_dependencies = Hash.new { |hash, key| hash[key] = [] }
@@ -16,14 +18,29 @@ class DrawDependencyGraph
       dep_extractor.extract
       @classes_dependencies[klass] += dep_extractor.dependencies
     end
-    pretty_print
+    draw_with_graphviz
   end
 
   private
 
-  def pretty_print
+  def draw_with_graphviz 
+    graph = GraphViz.new(:G, type: :digraph)
     @classes_dependencies.each do |klass, dependencies|
-      puts "#{klass} ==> #{dependencies.join(", ")}"
+      create_nodes_and_edges_for_class_dependencies(
+        graph, klass, dependencies)
+    end
+    graph.output(png: "#{@file_without_extension}.png")
+  end
+
+  def create_nodes_and_edges_for_class_dependencies(
+    graph, klass, dependencies)
+    class_node = graph.add_nodes(klass.to_s)
+    dependency_nodes = []
+    dependencies.each do |dep| 
+      dependency_nodes << graph.add_nodes(dep.to_s) 
+    end
+    dependency_nodes.each do |dep_node| 
+      graph.add_edges(class_node, dep_node)
     end
   end
 end

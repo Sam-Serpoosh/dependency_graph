@@ -26,6 +26,7 @@ class ClassDefinitionExtractor
     @code_lines.each do |line|
       manage_scopes_and_class_defs(line)
     end
+    remove_classes_with_empty_definition
   end
 
   def class_def?(line)
@@ -114,5 +115,11 @@ class ClassDefinitionExtractor
     previous_class = @classes_and_scopes.pop
     @current_class = previous_class.class_name
     previous_class.scopes_count.times { scopes.push(NEW_SCOPE) }
+  end
+
+  def remove_classes_with_empty_definition
+    @class_defs.each do |klass, def_code|
+      @class_defs.delete(klass) if def_code.length <= 1
+    end
   end
 end

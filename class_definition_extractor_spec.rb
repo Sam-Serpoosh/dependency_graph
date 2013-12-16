@@ -70,6 +70,8 @@ describe ClassDefinitionExtractor do
       it "stores the name of the class when enter its definition" do
         code = %Q{
           class Foo
+            def bar
+            end
           end
         }
         extractor = ClassDefinitionExtractor.new(code)
@@ -107,9 +109,13 @@ describe ClassDefinitionExtractor do
       it "stores all defined class names in the code" do
         code = %Q{
           class Foo
+            def foo
+            end
           end
 
           class Bar
+            def bar
+            end
           end
         }
         extractor = ClassDefinitionExtractor.new(code)
@@ -141,11 +147,15 @@ describe ClassDefinitionExtractor do
       it "does NOT store lines between class definitions - if exists" do
         code = %Q{
           class Foo
+            def foo
+            end
           end
 
           puts "hello world!"
 
           class Bar
+            def bar
+            end
           end
         }
         extractor = ClassDefinitionExtractor.new(code)
@@ -189,6 +199,8 @@ describe ClassDefinitionExtractor do
       code = %Q{
         module M
           class C
+            def foo
+            end
           end
         end
       }
@@ -214,6 +226,22 @@ describe ClassDefinitionExtractor do
       extractor.class_defs["A::B"].should include(%[puts "Hello from B"])
       extractor.class_defs["A::B"].
         should_not include(%Q[puts "Bye from A"])
+    end
+  end
+
+  context "#class_or_module_with_no_lines_of_code" do
+    it "does not include a empty definition class or module" do
+      code = %Q{
+        module A
+          class B
+            def foo
+            end
+          end
+        end
+      }
+      extractor = ClassDefinitionExtractor.new(code)
+      extractor.extract
+      extractor.class_defs.keys.should == ["A::B"]
     end
   end
 end

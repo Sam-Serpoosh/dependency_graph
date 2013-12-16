@@ -85,12 +85,9 @@ class ClassDefinitionExtractor
   def add_line_to_class_def(line)
     if scopes.empty? || @current_class.nil?
       return if @classes_and_scopes.empty?
-      previous_class = @classes_and_scopes.pop
-      @current_class = previous_class.class_name
-      previous_class.scopes_count.times { scopes.push(NEW_SCOPE) }
+      restore_to_previous_scope
     else
-      class_defs[@current_class] << line unless scopes.empty? || 
-        @current_class.nil?
+      class_defs[@current_class] << line  
     end
   end
 
@@ -109,5 +106,11 @@ class ClassDefinitionExtractor
   def left_scope?(line)
     tokens = line.split(/\s+/)
     tokens.first == END_WORD
+  end
+
+  def restore_to_previous_scope
+    previous_class = @classes_and_scopes.pop
+    @current_class = previous_class.class_name
+    previous_class.scopes_count.times { scopes.push(NEW_SCOPE) }
   end
 end

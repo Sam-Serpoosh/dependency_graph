@@ -1,4 +1,4 @@
-require_relative "./class_definition_extractor"
+require_relative "../lib/class_definition_extractor"
 
 describe ClassDefinitionExtractor do 
   context "#no_nested_calsses_or_modules" do

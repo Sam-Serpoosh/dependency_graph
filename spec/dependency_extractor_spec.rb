@@ -1,4 +1,4 @@
-require_relative "./dependency_extractor"
+require_relative "../lib/dependency_extractor"
 
 describe DependencyExtractor do
   it "detects usage of another class" do

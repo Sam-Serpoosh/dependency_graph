@@ -8,18 +8,18 @@ Having a tool that will generate the dependency graph of the class you're workin
 
 Imagine the following very simple stupid ruby code is in the foo.rb file:
 
-```
+```ruby
 class Foo
-	CONSTANT = "SOME VALUE"
+  CONSTANT = "some value"
 	
-	def initialize
-		bar = Bar.new(some_argument)
-	end
+  def initialize
+	bar = Bar.new(some_argument)
+  end
 	
-	def foo
-		bar.baz
-		AnotherClass.some_method("foo bar")
-	end
+  def foo
+	bar.baz
+	AnotherClass.some_method("foo bar")
+  end
 end
 ```
 

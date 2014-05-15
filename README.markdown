@@ -31,7 +31,7 @@ ruby lib/draw_dependency_graph.rb foo.rb
 
 and you'll get the following dependency grap
 
-![Dependency Graph or Foo Class](http://masihjesus.files.wordpress.com/2013/11/foo1.png)
+![Dependency Graph or Foo Class](https://dl.dropboxusercontent.com/u/100502983/dependency_graph_pics/sample_dependency_graph.png)
 
 Of course this is a super-simplified example for explanation purposes here!
 
